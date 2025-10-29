@@ -1,0 +1,243 @@
+{
+  "proyecto": {
+    "nombre": "Bolsa Inmobiliaria Ecuatoriana",
+    "descripcion": "Aplicación para compra, venta y renta de propiedades",
+    "version": "1.0.0",
+    "tipo": "Flutter App"
+  },
+  "arquitectura": {
+    "patron": "Clean Architecture + MVVM",
+    "separacion_capas": "estricta",
+    "cliente_http": "Dio",
+    "api_base_url": "https://mercadoinmobiliario.ec/admin/apis/",
+    "base_datos_local": {
+      "motor": "SQLite",
+      "libreria": "sqflite ^2.4.1",
+      "nombre_bd": "triara.db",
+      "version": 1,
+      "configuracion": {
+        "wal_mode": true,
+        "foreign_keys": true,
+        "timeout_segundos": 30,
+        "cache_size": 100
+      }
+    }
+  },
+  "estructura_carpetas": {
+    "lib": {
+      "core": {
+        "descripcion": "Configuración global, constantes, theme y utilidades compartidas",
+        "responsabilidades": "Elementos transversales a toda la aplicación que no pertenecen a una capa específica",
+        "subcarpetas": {
+          "config": {
+            "rol": "Configuraciones globales de la aplicación",
+            "archivos_tipo": [
+              "app_config.dart - configuración de Dio, interceptors, timeouts",
+              "database_config.dart - configuración de SQLite, nombres de tablas, constantes BD"
+            ],
+            "responsabilidad": "Centralizar configuraciones de servicios externos y bibliotecas"
+          },
+          "constants": {
+            "rol": "Constantes globales de la aplicación", 
+            "archivos_tipo": ["app_constants.dart - URLs, timeouts, claves de almacenamiento"],
+            "responsabilidad": "Valores constantes accesibles desde cualquier parte de la app"
+          },
+          "theme": {
+            "rol": "Definición de temas visuales y estilos",
+            "archivos_tipo": ["app_theme.dart - colores, tipografía, ThemeData"],
+            "responsabilidad": "Centralizar toda la apariencia visual de la aplicación"
+          },
+          "utils": {
+            "rol": "Funciones utilitarias y helpers generales",
+            "archivos_tipo": ["app_utils.dart - formatters, validators, helpers"],
+            "responsabilidad": "Funciones auxiliares reutilizables en toda la aplicación"
+          },
+          "errors": {
+            "rol": "Manejo centralizado de errores y excepciones",
+            "archivos_tipo": ["failures.dart - clases de fallas", "exceptions.dart - excepciones personalizadas"],
+            "responsabilidad": "Tipos de errores y excepciones estándar para toda la app"
+          }
+        }
+      },
+      "data": {
+        "descripcion": "Capa de acceso a datos - implementaciones concretas",
+        "responsabilidades": "Obtener datos de APIs, base de datos local, caché. Mapear entre modelos y entidades",
+        "subcarpetas": {
+          "models": {
+            "rol": "Modelos de datos con serialización JSON",
+            "archivos_tipo": ["propiedad_model.dart - extiende PropiedadEntity, fromJson/toJson"],
+            "responsabilidad": "Representar datos como vienen/van a fuentes externas, manejar serialización"
+          },
+          "repositories": {
+            "rol": "Implementaciones concretas de repositorios del domain",
+            "archivos_tipo": ["propiedad_repository_impl.dart - implementa PropiedadRepository"],
+            "responsabilidad": "Coordinar data sources, manejar caché, mapear models a entities"
+          },
+          "data_sources": {
+            "rol": "Fuentes de datos específicas",
+            "subcarpetas": {
+              "remote": {
+                "rol": "Acceso a APIs remotas",
+                "archivos_tipo": ["propiedad_api_service.dart - llamadas HTTP con Dio"],
+                "responsabilidad": "Comunicación directa con servicios web externos"
+              },
+              "local": {
+                "rol": "Almacenamiento local y caché",
+                "archivos_tipo": [
+                  "database_service.dart - servicio abstracto e implementación de SQLite",
+                  "propiedad_local_datasource.dart - data source específico para propiedades",
+                  "usuario_local_datasource.dart - data source específico para usuarios"
+                ],
+                "responsabilidad": "Persistencia local, caché offline, almacenamiento temporal",
+                "implementacion_sqlite": {
+                  "tablas": ["propiedades", "usuarios", "favoritos"],
+                  "caracteristicas": ["CRUD completo", "transacciones ACID", "índices optimizados", "soft delete"],
+                  "operaciones": ["búsquedas avanzadas", "filtros múltiples", "gestión de favoritos", "sincronización offline"]
+                }
+              }
+            }
+          }
+        }
+      },
+      "domain": {
+        "descripcion": "Capa de lógica de negocio pura - sin dependencias externas",
+        "responsabilidades": "Definir reglas de negocio, entidades, contratos de repositorios",
+        "subcarpetas": {
+          "entities": {
+            "rol": "Objetos de negocio puros sin lógica de persistencia",
+            "archivos_tipo": ["propiedad_entity.dart - estructura de datos del dominio"],
+            "responsabilidad": "Representar conceptos de negocio, validaciones básicas, igualdad"
+          },
+          "repositories": {
+            "rol": "Contratos abstractos para acceso a datos",
+            "archivos_tipo": ["propiedad_repository.dart - interface abstracta"],
+            "responsabilidad": "Definir qué operaciones se pueden hacer con datos, sin implementación"
+          },
+          "use_cases": {
+            "rol": "Casos de uso específicos - lógica de negocio",
+            "archivos_tipo": ["obtener_propiedades_use_case.dart - reglas de filtrado"],
+            "responsabilidad": "Implementar reglas de negocio específicas, validaciones complejas"
+          }
+        }
+      },
+      "presentation": {
+        "descripcion": "Capa de interfaz de usuario y gestión de estado",
+        "responsabilidades": "Mostrar datos al usuario, manejar interacciones, gestionar estado de UI",
+        "subcarpetas": {
+          "pages": {
+            "rol": "Pantallas completas de la aplicación",
+            "archivos_tipo": ["home_page.dart - pantalla principal", "propiedad_detalle_page.dart"],
+            "responsabilidad": "Estructurar pantallas completas, manejar navegación, orquestar widgets"
+          },
+          "widgets": {
+            "rol": "Componentes de UI reutilizables",
+            "archivos_tipo": ["propiedad_card_widget.dart - tarjeta de propiedad"],
+            "responsabilidad": "Widgets personalizados reutilizables, componentes de UI específicos"
+          },
+          "controllers": {
+            "rol": "Lógica de presentación y gestión de estado (MVVM)",
+            "archivos_tipo": ["propiedades_controller.dart - ChangeNotifier/Cubit"],
+            "responsabilidad": "Manejar estado de UI, llamar use cases, preparar datos para widgets"
+          },
+          "providers": {
+            "rol": "Gestores de estado global y dependencias",
+            "archivos_tipo": ["auth_provider.dart - estado de autenticación"],
+            "responsabilidad": "Estado compartido entre pantallas, inyección de dependencias"
+          }
+        }
+      }
+    }
+  },
+  "convenciones_nomenclatura": {
+    "clases": "PascalCase",
+    "archivos_carpetas": "snake_case",
+    "variables": "camelCase",
+    "constantes": "SCREAMING_SNAKE_CASE",
+    "sufijos": {
+      "modelos": "Model",
+      "repositorios": "Repository", 
+      "casos_uso": "UseCase",
+      "servicios": "Service",
+      "providers": "Provider",
+      "controladores": "Controller"
+    }
+  },
+  "tema": {
+    "color_primario": "#1a2c5b",
+    "tipografia": "Roboto",
+    "paleta_colores": {
+      "base": "#1a2c5b",
+      "variante_oscura": "#2e4170",
+      "intermedio": "#405a8a", 
+      "acento_claro": "#5f7bb0",
+      "secundarios": "#8fa5d6"
+    }
+  },
+  "reglas_arquitectonicas": {
+    "dependencias": {
+      "domain_no_depende_de": ["data", "presentation"],
+      "data_depende_de": ["domain"],
+      "presentation_depende_de": ["domain", "core"]
+    },
+    "separacion_responsabilidades": {
+      "core": "Configuración transversal - sin lógica de negocio",
+      "domain": "Lógica de negocio pura - sin dependencias de frameworks",
+      "data": "Acceso a datos y mapeo - implementa contratos del domain",
+      "presentation": "UI y gestión de estado - consume use cases del domain"
+    },
+    "flujo_datos": {
+      "entrada": "presentation -> domain (use cases) -> data (repositories) -> data sources",
+      "salida": "data sources -> repositories -> use cases -> controllers -> widgets",
+      "regla_mapeo": "data sources retornan models, repositories mapean a entities"
+    },
+    "patrones_por_capa": {
+      "domain": ["Repository Pattern", "Use Case Pattern", "Entity Pattern"],
+      "data": ["Repository Implementation", "Model Pattern", "Data Source Pattern"],
+      "presentation": ["MVVM", "Observer Pattern", "Widget Composition"],
+      "core": ["Singleton Pattern", "Factory Pattern", "Configuration Pattern"]
+    }
+  },
+  "estandares_codigo": {
+    "idioma_documentacion": "español",
+    "idioma_codigo": "inglés_español_mixto",
+    "comentarios": "obligatorios_en_clases_publicas",
+    "imports": "ordenados_alfabeticamente",
+    "estructura_archivos": {
+      "orden_imports": [
+        "1. Packages externos (flutter, dio, etc.)",
+        "2. Imports relativos de core",
+        "3. Imports relativos de domain", 
+        "4. Imports relativos de data",
+        "5. Imports relativos de presentation"
+      ],
+      "estructura_clase": [
+        "1. Documentación /// con descripción",
+        "2. Propiedades/campos",
+        "3. Constructor",
+        "4. Métodos públicos",
+        "5. Métodos privados",
+        "6. Overrides (toString, ==, hashCode)"
+      ]
+    },
+    "ejemplo_archivo_completo": {
+      "ubicacion": "lib/domain/entities/propiedad_entity.dart",
+      "estructura": [
+        "/// Documentación de la clase",
+        "class PropiedadEntity {",
+        "  // Propiedades finales", 
+        "  final String id;",
+        "  ",
+        "  // Constructor con parámetros nombrados requeridos",
+        "  const PropiedadEntity({required this.id});",
+        "  ",
+        "  // Métodos públicos de negocio",
+        "  String get displayName => ...",
+        "  ",
+        "  // Overrides estándar",
+        "  @override",
+        "  bool operator ==(Object other) => ...",
+        "}"
+      ]
+    }
+  }
+}
