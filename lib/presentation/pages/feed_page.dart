@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../domain/entities/feed_entity.dart';
+import '../../domain/entities/propiedad_entity.dart';
 import '../controllers/feed_controller.dart';
 import '../widgets/feed_card.dart';
-import '../widgets/feed_detail_modal.dart';
+// import '../widgets/feed_detail_modal.dart';
 import '../../core/theme/app_theme.dart';
 
 /// Pantalla principal del feed de propiedades
@@ -58,12 +59,33 @@ class _FeedPageState extends State<FeedPage> {
 
   /// Maneja el clic en una card del feed
   void _onFeedCardTap(FeedEntity feedItem) {
-    FeedDetailModal.show(context, feedItem);
+    // Convertir FeedEntity a PropiedadEntity temporal para la vista de detalle
+    final propiedadTemp = PropiedadEntity(
+      id: feedItem.idVivienda,
+      titulo: feedItem.modelo,
+      descripcion: '', // Se cargará en el detalle
+      precio: feedItem.precio,
+      tipoOperacion: '', // Se cargará
+      tipoPropiedad: '', // Se cargará
+      area: feedItem.area,
+      areaLote: 0,
+      habitaciones: 0,
+      banos: 0,
+      direccion: feedItem.localidad,
+      ciudad: feedItem.ciudad,
+      provincia: feedItem.ciudad,
+      imagenes: feedItem.imgPrincipal.isNotEmpty ? [feedItem.imgPrincipal] : [],
+      fechaPublicacion: feedItem.fechaHora,
+      activa: true,
+    );
+    
+    Get.toNamed('/propiedad-detalle', arguments: propiedadTemp);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F9FF), // Fondo azul pastel muy leve
       appBar: _buildAppBar(),
       body: Obx(() {
         if (controller.isLoading && controller.feedItems.isEmpty) {

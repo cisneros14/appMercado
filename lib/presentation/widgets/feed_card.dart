@@ -21,9 +21,13 @@ class FeedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 3,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 4, // Un poco más de elevación
+      color: Colors.white,
+      shadowColor: const Color(0xFF1a2c5b).withOpacity(0.2), // Sombra más visible
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.grey.shade200, width: 1),
+      ),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
@@ -269,26 +273,32 @@ class FeedCard extends StatelessWidget {
         const SizedBox(height: 16),
 
         // Información adicional en fila
+        // Información adicional en fila
         Row(
           children: [
             // Área
-            Expanded(
-              child: _buildInfoChip(
-                icon: Icons.square_foot,
-                label: feedItem.areaFormateada,
-                context: context,
+            if (feedItem.areaFormateada.isNotEmpty)
+              Expanded(
+                child: _buildInfoChip(
+                  icon: Icons.square_foot,
+                  label: feedItem.areaFormateada,
+                  context: context,
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
+            
+            if (feedItem.areaFormateada.isNotEmpty && feedItem.ciudad.isNotEmpty)
+              const SizedBox(width: 12),
+
             // Ubicación
-            Expanded(
-              flex: 2,
-              child: _buildInfoChip(
-                icon: Icons.location_on,
-                label: feedItem.ciudad,
-                context: context,
+            if (feedItem.ciudad.isNotEmpty)
+              Expanded(
+                flex: 2,
+                child: _buildInfoChip(
+                  icon: Icons.location_on,
+                  label: feedItem.ciudad,
+                  context: context,
+                ),
               ),
-            ),
           ],
         ),
       ],
@@ -301,6 +311,8 @@ class FeedCard extends StatelessWidget {
     required String label,
     required BuildContext context,
   }) {
+    if (label.isEmpty || label.trim().isEmpty) return const SizedBox.shrink();
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(

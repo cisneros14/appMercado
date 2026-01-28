@@ -23,17 +23,38 @@ class FeedModel extends FeedEntity {
   /// Recibe el mapa JSON de la API y lo convierte a FeedModel.
   /// Maneja la conversión de tipos y valores por defecto.
   factory FeedModel.fromJson(Map<String, dynamic> json) {
+    // Buscar ciudad/localidad de forma ultra-robusta
+    String ciudad = json['ciudad']?.toString() ?? 
+                    json['ciudad_nombre']?.toString() ?? 
+                    json['c_ciudad']?.toString() ?? 
+                    json['ubicacion_nombre']?.toString() ?? '';
+                    
+    String localidad = json['localidad']?.toString() ?? 
+                       json['sector']?.toString() ?? 
+                       json['canton']?.toString() ?? 
+                       json['parroquia']?.toString() ?? '';
+    
+    // Fallback: si ciudad es vacía pero tenemos localidad, usar esa
+    if (ciudad.isEmpty) ciudad = localidad;
+    // Segundo fallback: extraer de la dirección si existe
+    if (ciudad.isEmpty && json['direccion'] != null) {
+      final parts = json['direccion'].toString().split(',');
+      if (parts.length > 1) {
+        ciudad = parts.last.trim();
+      }
+    }
+
     return FeedModel(
-      fechaHora: DateTime.tryParse(json['fecha_hora'] ?? '') ?? DateTime.now(),
-      notificacion: json['notificacion']?.toString() ?? '',
-      idVivienda: json['id_vivienda']?.toString() ?? '',
-      modelo: json['modelo']?.toString() ?? '',
-      precio: _parseDouble(json['precio']),
-      area: _parseDouble(json['area']),
-      imgPrincipal: json['img_principal']?.toString() ?? '',
-      ciudad: json['ciudad']?.toString() ?? '',
-      localidad: json['localidad']?.toString() ?? '',
-      user: FeedUserModel.fromJson(json['user'] ?? {}),
+      fechaHora: DateTime.tryParse(json['fecha_hora']?.toString() ?? json['fecha']?.toString() ?? '') ?? DateTime.now(),
+      notificacion: json['notificacion']?.toString() ?? json['mensaje']?.toString() ?? 'Nueva actividad',
+      idVivienda: json['id_vivienda']?.toString() ?? json['id']?.toString() ?? '',
+      modelo: json['modelo']?.toString() ?? json['m_modelo']?.toString() ?? json['titulo']?.toString() ?? 'Propiedad',
+      precio: _parseDouble(json['precio'] ?? json['valor'] ?? json['costo']),
+      area: _parseDouble(json['area'] ?? json['superficie'] ?? json['metros']),
+      imgPrincipal: json['img_principal']?.toString() ?? json['imagen']?.toString() ?? json['foto']?.toString() ?? '',
+      ciudad: ciudad,
+      localidad: localidad,
+      user: FeedUserModel.fromJson(json['user'] is Map ? Map<String, dynamic>.from(json['user']) : {}),
     );
   }
 

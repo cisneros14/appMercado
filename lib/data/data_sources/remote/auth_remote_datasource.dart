@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import '../../../core/constants/api_constants.dart';
+import '../../../core/config/app_config.dart';
 import '../../models/user_model.dart';
 
 /// Data source remoto para manejo de autenticación con API.
@@ -9,34 +10,7 @@ import '../../models/user_model.dart';
 class AuthRemoteDataSource {
   final Dio _dio;
 
-  AuthRemoteDataSource({Dio? dio}) : _dio = dio ?? _createDio();
-
-  /// Crea una instancia de Dio con configuración optimizada
-  static Dio _createDio() {
-    final dio = Dio();
-    
-    // Configuración de timeouts
-    dio.options.connectTimeout = const Duration(seconds: 30);
-    dio.options.receiveTimeout = const Duration(seconds: 30);
-    dio.options.sendTimeout = const Duration(seconds: 30);
-    
-    // Headers por defecto
-    dio.options.headers = {
-      'Accept': 'application/json',
-      'User-Agent': 'Triara-App/1.0',
-    };
-
-    // Interceptor para logging en debug
-    dio.interceptors.add(LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-      requestHeader: true,
-      responseHeader: false,
-      error: true,
-    ));
-
-    return dio;
-  }
+  AuthRemoteDataSource({Dio? dio}) : _dio = dio ?? AppConfig.createDioClient();
 
   /// Realiza login con credenciales del usuario
   ///
@@ -68,13 +42,18 @@ class AuthRemoteDataSource {
 
       // Verificar respuesta exitosa
       if (response.statusCode == 200) {
-        final responseData = response.data as Map<String, dynamic>;
+        final dynamic data = response.data;
+        if (data is! Map) {
+          throw Exception('Formato de respuesta inválido');
+        }
+        final Map<String, dynamic> responseData = Map<String, dynamic>.from(data);
 
         // Verificar status de la respuesta
         if (responseData['status'] == 'success') {
           // Extraer datos del usuario y token
-          final userData = responseData['user'] as Map<String, dynamic>;
-          final token = responseData['token'] as String;
+          final dynamic rawUserData = responseData['user'];
+          final Map<String, dynamic> userData = rawUserData is Map ? Map<String, dynamic>.from(rawUserData) : {};
+          final token = responseData['token']?.toString() ?? '';
 
           // Debug: imprimir datos recibidos
           print('🔍 Debug - Datos de usuario recibidos:');

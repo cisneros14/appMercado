@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F9FF), // Fondo azul pastel muy leve
       appBar: AppBar(
         title: const Text(
           'BIE - Propiedades',
@@ -59,110 +59,161 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF1a2c5b), Color(0xFF2e4170)],
-          ),
-        ),
-        child: SafeArea(
-          child: Obx(() {
-            if (feedController.isLoading && feedController.feedItems.isEmpty) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Get.toNamed('/buscar-propiedades'),
+        backgroundColor: const Color(0xFF1a2c5b),
+        child: const Icon(Icons.search, color: Colors.white),
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Caja informativa del feed
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              color: Colors.white,
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF1a2c5b).withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF1a2c5b).withOpacity(0.1)),
                 ),
-              );
-            }
-
-            if (feedController.errorMessage != null &&
-                feedController.feedItems.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                child: Row(
                   children: [
-                    const Icon(
-                      Icons.error_outline,
-                      size: 64,
-                      color: Colors.white70,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      feedController.errorMessage!,
-                      style: const TextStyle(
-                        color: Colors.white70,
-                        fontSize: 16,
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
                       ),
-                      textAlign: TextAlign.center,
+                      child: const Icon(Icons.rss_feed, color: Color(0xFF1a2c5b)),
                     ),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () => feedController.loadInitialFeed(),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        foregroundColor: const Color(0xFF1a2c5b),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Feed de Noticias',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Color(0xFF1a2c5b),
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'Aquí verás las últimas propiedades subidas a la plataforma.',
+                            style: TextStyle(fontSize: 13, color: Colors.grey),
+                          ),
+                        ],
                       ),
-                      child: const Text('Reintentar'),
                     ),
                   ],
                 ),
-              );
-            }
-
-            if (feedController.feedItems.isEmpty) {
-              return const Center(
-                child: Text(
-                  'No hay propiedades disponibles',
-                  style: TextStyle(color: Colors.white70, fontSize: 16),
-                ),
-              );
-            }
-
-            return RefreshIndicator(
-              onRefresh: () => feedController.refreshFeed(),
-              color: const Color(0xFF1a2c5b),
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount:
-                    feedController.feedItems.length +
-                    (feedController.hasMoreData ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == feedController.feedItems.length) {
-                    // Cargar más datos
-                    if (feedController.isLoadingMore) {
-                      return const Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
-                            ),
-                          ),
-                        ),
-                      );
-                    } else {
-                      // Trigger para cargar más
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        feedController.loadMoreFeed();
-                      });
-                      return const SizedBox.shrink();
-                    }
-                  }
-
-                  final feed = feedController.feedItems[index];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: FeedCard(
-                      feedItem: feed,
-                      onTap: () => _showFeedDetail(context, feed),
+              ),
+            ),
+            
+            // Lista de propiedades (Feed)
+            Expanded(
+              child: Obx(() {
+                if (feedController.isLoading && feedController.feedItems.isEmpty) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF1a2c5b)),
                     ),
                   );
-                },
-              ),
-            );
-          }),
+                }
+    
+                if (feedController.errorMessage != null &&
+                    feedController.feedItems.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: Colors.red,
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          feedController.errorMessage!,
+                          style: const TextStyle(
+                            color: Colors.black87,
+                            fontSize: 16,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => feedController.loadInitialFeed(),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF1a2c5b),
+                            foregroundColor: Colors.white,
+                          ),
+                          child: const Text('Reintentar'),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+    
+                if (feedController.feedItems.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No hay propiedades disponibles',
+                      style: TextStyle(color: Colors.grey, fontSize: 16),
+                    ),
+                  );
+                }
+    
+                return RefreshIndicator(
+                  onRefresh: () => feedController.refreshFeed(),
+                  color: const Color(0xFF1a2c5b),
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    itemCount:
+                        feedController.feedItems.length +
+                        (feedController.hasMoreData ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == feedController.feedItems.length) {
+                        // Cargar más datos
+                        if (feedController.isLoadingMore) {
+                          return const Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(0xFF1a2c5b),
+                                ),
+                              ),
+                            ),
+                          );
+                        } else {
+                          // Trigger para cargar más
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            feedController.loadMoreFeed();
+                          });
+                          return const SizedBox.shrink();
+                        }
+                      }
+    
+                      final feed = feedController.feedItems[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: FeedCard(
+                          feedItem: feed,
+                          onTap: () => _showFeedDetail(context, feed),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }),
+            ),
+          ],
         ),
       ),
     );

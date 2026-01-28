@@ -11,12 +11,18 @@ class PropiedadEntity {
   final String tipoOperacion; // venta, renta, compra
   final String tipoPropiedad; // casa, apartamento, terreno, etc.
   final double area;
+  final double areaLote;
   final int habitaciones;
   final int banos;
+  final int niveles;
+  final int garage;
+  final String antiguedad;
+  final String video;
   final String direccion;
   final String ciudad;
   final String provincia;
   final List<String> imagenes;
+  final List<String> amenidades;
   // Moneda y datos del corredor (opcional)
   final String moneda;
   final String corredorId;
@@ -37,12 +43,18 @@ class PropiedadEntity {
     required this.tipoOperacion,
     required this.tipoPropiedad,
     required this.area,
+    required this.areaLote,
     required this.habitaciones,
     required this.banos,
+    this.niveles = 0,
+    this.garage = 0,
+    this.antiguedad = '',
+    this.video = '',
     required this.direccion,
     required this.ciudad,
     required this.provincia,
     required this.imagenes,
+    this.amenidades = const [],
     this.moneda = '\$',
     this.corredorId = '',
     this.corredorNombre = '',

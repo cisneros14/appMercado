@@ -6,6 +6,7 @@ import '../../domain/entities/propiedad_entity.dart';
 import '../../data/repositories/propiedad_repository_impl.dart';
 import '../../data/data_sources/remote/propiedad_remote_data_source.dart';
 import '../../core/widgets/smart_network_image.dart';
+import '../../core/widgets/screen_header_description.dart';
 
 class GestionPropiedadesPage extends StatefulWidget {
   const GestionPropiedadesPage({super.key});
@@ -114,9 +115,27 @@ class _GestionPropiedadesPageState extends State<GestionPropiedadesPage> {
         backgroundColor: const Color(0xFF1a2c5b),
         foregroundColor: Colors.white,
       ),
-      body: RefreshIndicator(
-        onRefresh: () => _fetch(reset: true),
-        child: _buildBody(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => Get.toNamed('/subir-propiedad'),
+        backgroundColor: const Color(0xFF1a2c5b),
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: const Text('Subir Propiedad'),
+      ),
+      body: Column(
+        children: [
+          const ScreenHeaderDescription(
+            title: 'Mis Propiedades',
+            description: 'Gestione su inventario inmobiliario. Puede editar, ver detalles o cargar nuevas propiedades.',
+            icon: Icons.inventory_2_outlined,
+          ),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () => _fetch(reset: true),
+              child: _buildBody(),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -136,10 +155,10 @@ class _GestionPropiedadesPageState extends State<GestionPropiedadesPage> {
 
     if (_items.isEmpty) {
       return _EmptyState(
-        title: 'Sin propiedades',
-        message: 'No has publicado propiedades todavía.',
-        actionText: 'Refrescar',
-        onAction: () => _fetch(reset: true),
+        title: 'No tienes propiedades',
+        message: 'Aún no has publicado ninguna propiedad en tu portafolio.',
+        actionText: 'Subir mi primera propiedad',
+        onAction: () => Get.toNamed('/subir-propiedad'),
       );
     }
 
@@ -280,6 +299,20 @@ class _PropiedadCard extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1a2c5b),
                   ),
+                ),
+                const Divider(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () => Get.toNamed('/subir-propiedad', arguments: propiedad),
+                      icon: const Icon(Icons.edit, size: 20),
+                      label: const Text('EDITAR'),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFF1a2c5b),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

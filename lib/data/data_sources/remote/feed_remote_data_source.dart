@@ -50,7 +50,11 @@ class FeedRemoteDataSourceImpl implements FeedRemoteDataSource {
       }
 
       // Verificar estructura de respuesta
-      final Map<String, dynamic> responseData = response.data;
+      final dynamic data = response.data;
+      if (data is! Map<String, dynamic>) {
+        throw ServerException('Formato de respuesta inválido: ${data.runtimeType}');
+      }
+      final Map<String, dynamic> responseData = data;
 
       if (responseData['status'] != 'success') {
         throw ServerException(
@@ -60,10 +64,10 @@ class FeedRemoteDataSourceImpl implements FeedRemoteDataSource {
       }
 
       // Extraer y convertir datos del feed
-      final List<dynamic> feedData = responseData['data'] ?? [];
+      final List<dynamic> feedData = responseData['data'] is List ? responseData['data'] : [];
 
       return feedData
-          .map((json) => FeedModel.fromJson(json as Map<String, dynamic>))
+          .map((json) => FeedModel.fromJson(json is Map ? Map<String, dynamic>.from(json) : {}))
           .toList();
     } on DioException catch (e) {
       // Manejar errores específicos de Dio

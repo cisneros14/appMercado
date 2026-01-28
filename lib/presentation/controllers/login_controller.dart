@@ -18,7 +18,7 @@ class LoginController extends GetxController {
   final passwordController = TextEditingController();
 
   // Clave del formulario para validaciones
-  final formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>(debugLabel: 'loginFormKey');
 
   // Estados reactivos
   final _isLoading = false.obs;

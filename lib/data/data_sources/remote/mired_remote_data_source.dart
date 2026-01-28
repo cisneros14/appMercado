@@ -1,6 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 import '../../../core/constants/api_constants.dart';
+import '../../../core/config/app_config.dart';
 import '../local/auth_local_datasource.dart';
 
 /// Remote data source para la funcionalidad "Mi Red".
@@ -8,9 +9,7 @@ class MiRedRemoteDataSource {
   final Dio _dio;
 
   MiRedRemoteDataSource({Dio? dio})
-    : _dio = dio ?? Dio(BaseOptions(baseUrl: ApiConstants.BASE_URL)) {
-    _dio.options.baseUrl = ApiConstants.BASE_URL;
-  }
+    : _dio = dio ?? AppConfig.createDioClient();
 
   /// Helper que intenta primero `mired.php` y ante un 404 intenta `apiMiredRef.php`.
   Future<Response> _getWithFallback(

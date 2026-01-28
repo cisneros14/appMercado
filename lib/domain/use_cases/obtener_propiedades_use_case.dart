@@ -15,6 +15,7 @@ class ObtenerPropiedadesUseCase {
   Future<List<PropiedadEntity>> call({
     int pagina = 1,
     int limite = 20,
+    String? searchTerm,
     String? tipoOperacion,
     String? tipoPropiedad,
     double? precioMin,
@@ -50,6 +51,7 @@ class ObtenerPropiedadesUseCase {
     return await repository.obtenerPropiedades(
       pagina: pagina,
       limite: limite,
+      searchTerm: searchTerm,
       tipoOperacion: tipoOperacion,
       tipoPropiedad: tipoPropiedad,
       precioMin: precioMin,

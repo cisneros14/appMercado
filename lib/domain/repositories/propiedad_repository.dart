@@ -10,6 +10,7 @@ abstract class PropiedadRepository {
   Future<List<PropiedadEntity>> obtenerPropiedades({
     int pagina = 1,
     int limite = 20,
+    String? searchTerm, // Nuevo parámetro de búsqueda
     String? tipoOperacion,
     String? tipoPropiedad,
     double? precioMin,
@@ -48,4 +49,12 @@ abstract class PropiedadRepository {
 
   /// Marca/desmarca una propiedad como favorita
   Future<void> toggleFavorito(String propiedadId, String usuarioId);
+
+  /// Obtiene catálogos para el formulario de creación
+  Future<List<Map<String, dynamic>>> obtenerTiposInmueble();
+  Future<List<Map<String, dynamic>>> obtenerAmenidades();
+  Future<List<Map<String, dynamic>>> obtenerLocalidades({
+    required String tipo,
+    String? parent,
+  });
 }

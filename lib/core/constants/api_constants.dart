@@ -9,6 +9,9 @@ class ApiConstants {
   /// Endpoint para login de usuarios
   static const String LOGIN_ENDPOINT = '${BASE_URL}login.php';
 
+  /// Endpoint de Sistema Terra V2
+  static const String TERRA_API_ENDPOINT = '${BASE_URL}api_sistema_terra.php';
+
   /// Endpoint para logout (si existe)
   static const String LOGOUT_ENDPOINT = '${BASE_URL}logout.php';
 

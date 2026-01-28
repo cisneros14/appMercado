@@ -12,6 +12,7 @@ String normalizeImage(dynamic img) {
   if (s.isEmpty) return defaultPath;
   if (s.startsWith('http')) return Uri.encodeFull(s);
   if (s.startsWith('//')) return Uri.encodeFull('https:$s');
+  if (s.startsWith('file:')) return s; // Mantener local para Image.file
 
   // Limpiar referencias relativas (./ ../) y backslashes
   var cleaned = s.replaceAll(RegExp(r'^(?:\./|\.\./)+'), '');
@@ -27,6 +28,8 @@ String normalizeImage(dynamic img) {
   }
 
   // Manejar formas comunes
+  if (cleaned.startsWith('images/'))
+    return Uri.encodeFull('$baseHost/$cleaned');
   if (cleaned.startsWith('/admin/img/'))
     return Uri.encodeFull('$baseHost$cleaned');
   if (cleaned.startsWith('/img/'))
@@ -52,6 +55,7 @@ List<String> normalizeImageVariants(dynamic img) {
   if (s.isEmpty) return [defaultPath];
   if (s.startsWith('http')) return [Uri.encodeFull(s)];
   if (s.startsWith('//')) return [Uri.encodeFull('https:$s')];
+  if (s.startsWith('file:')) return [s]; // Mantener local para Image.file
 
   var cleaned = s.replaceAll(RegExp(r'^(?:\./|\.\./)+'), '');
   cleaned = cleaned.replaceAll('\\', '/');
@@ -67,6 +71,10 @@ List<String> normalizeImageVariants(dynamic img) {
     );
   }
 
+  if (cleaned.startsWith('images/')) {
+    out.add(Uri.encodeFull('$baseHost/$cleaned'));
+    out.add(Uri.encodeFull('$baseHost/admin/$cleaned'));
+  }
   // Variantes comunes para imagenes de usuarios/admin y propiedades
   if (cleaned.startsWith('/admin/img/'))
     out.add(Uri.encodeFull('$baseHost$cleaned'));
@@ -76,7 +84,9 @@ List<String> normalizeImageVariants(dynamic img) {
     out.add(Uri.encodeFull('$baseHost/images/$cleaned')); // propiedades
     out.add(Uri.encodeFull('$baseHost/admin/$cleaned')); // agentes
     out.add(Uri.encodeFull('$baseHost/admin/img/$cleaned'));
-    out.add(Uri.encodeFull('$baseHost/admin/apis/$cleaned'));
+    out.add(Uri.encodeFull('$baseHost/admin/images/$cleaned'));
+    out.add(Uri.encodeFull('$baseHost/images/${cleaned.replaceFirst('img/', '')}'));
+    out.add(Uri.encodeFull('$baseHost/admin/img/${cleaned.replaceFirst('img/', '')}'));
   }
 
   if (cleaned.startsWith('admin/img/'))
