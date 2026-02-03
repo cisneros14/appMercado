@@ -41,4 +41,21 @@ abstract class AuthRepository {
   ///
   /// [token] nuevo token de autenticación
   Future<void> updateToken(String token);
+
+  /// Obtiene el catálogo de provincias y ciudades
+  Future<Map<String, List<String>>> getProvincias();
+
+  /// Registra un nuevo usuario
+  Future<Map<String, dynamic>> registerUser({
+    required String nombres,
+    required String apellidos,
+    required String email,
+    required String celular,
+    required String matricula,
+    required String password,
+    required String provincia,
+    required String ciudad,
+    required bool aceptoPrivacidad,
+    required String filePath,
+  });
 }

@@ -32,71 +32,59 @@ class OnboardingSlideWidget extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              _hexToColor(slide.colorFondo),
-              _hexToColor(slide.colorFondo).withOpacity(0.8),
-            ],
-          ),
-        ),
+        color: Colors.white, // Fondo blanco solicitado
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
             child: Column(
               children: [
                 // Espaciador superior
-                const SizedBox(height: 60),
+                const SizedBox(height: 40),
 
                 // Imagen del slide con altura ajustada
                 SizedBox(
-                  height:
-                      MediaQuery.of(context).size.height *
-                      (slide.esUltimoSlide ? 0.25 : 0.35),
+                  height: MediaQuery.of(context).size.height * 0.35,
                   child: _buildImage(),
                 ),
 
-                SizedBox(height: slide.esUltimoSlide ? 24 : 40),
+                const SizedBox(height: 40),
 
-                // Contenido de texto con mejor espaciado
+                // Contenido de texto
                 Expanded(
                   child: Column(
                     children: [
-                      // Título con mejor tipografía
-                      if (slide.orden != 4)
-                        Text(
-                          slide.titulo,
-                          style: Theme.of(context).textTheme.headlineMedium
-                              ?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: slide.esUltimoSlide ? 28 : 32,
-                                height: 1.2,
-                              ),
-                          textAlign: TextAlign.center,
-                          softWrap: true,
-                        ),
+
+                      // Título
+                      Text(
+                        slide.titulo,
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(
+                              color: const Color(0xFF1a2c5b), // Azul corporativo
+                              fontWeight: FontWeight.bold,
+                              fontSize: 28,
+                              height: 1.2,
+                            ),
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                      ),
 
                       SizedBox(height: slide.esUltimoSlide ? 16 : 24),
 
-                      // Descripción con mejor legibilidad
-                      if (slide.orden != 4)
-                        Text(
-                          slide.descripcion,
-                          style: Theme.of(context).textTheme.bodyLarge
-                              ?.copyWith(
-                                color: Colors.white.withOpacity(0.9),
-                                fontSize: slide.esUltimoSlide ? 16 : 18,
-                                height: 1.5,
-                                fontWeight: FontWeight.w400,
-                              ),
-                          textAlign: TextAlign.center,
-                          softWrap: true,
-                        ),
+                      // Descripción
+                      Text(
+                        slide.descripcion,
+                        style: Theme.of(context).textTheme.bodyLarge
+                            ?.copyWith(
+                              color: const Color(0xFF1a2c5b).withOpacity(0.8),
+                              fontSize: 16,
+                              height: 1.5,
+                              fontWeight: FontWeight.w400,
+                            ),
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                      ),
 
-                      // Espaciador flexible para separar texto de botones
+                      // Espaciador flexible
                       if (slide.esUltimoSlide) const SizedBox(height: 32),
 
                       // Botones de acción si es el último slide
@@ -112,7 +100,7 @@ class OnboardingSlideWidget extends StatelessWidget {
                 ),
 
                 // Espaciador inferior
-                SizedBox(height: slide.esUltimoSlide ? 40 : 80),
+                SizedBox(height: slide.esUltimoSlide ? 20 : 60),
               ],
             ),
           ),
@@ -128,29 +116,43 @@ class OnboardingSlideWidget extends StatelessWidget {
 
   /// Construye el contenido específico de la imagen
   Widget _buildImageContent() {
-    // Para el primer slide, mostrar el logo
+    // Para el primer slide o el último (bienvenida/login), mostrar el logo
     if (slide.orden == 1 || slide.orden == 4) {
-      return Container(
-        padding: const EdgeInsets.all(20),
-        child: Image.asset(
-          'assets/images/logo.png',
-          fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) {
-            // Fallback al icono si el logo no se encuentra
-            return _buildIconFallback();
-          },
+      return Center(
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1a2c5b), // Fondo azul
+            borderRadius: BorderRadius.circular(30), // Bordes redondeados
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: Image.asset(
+            'assets/images/logo.png',
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return _buildIconFallback();
+            },
+          ),
         ),
       );
     }
 
-    // Para otros slides, mostrar la imagen del slide
+    // Para otros slides, mostrar la imagen del slide (sin fondo azul, o como se desee)
+    // El usuario pidió logo con fondo azul. Las otras imágenes (vectoriales/ilustraciones)
+    // probablemente se vean bien sobre blanco.
     return Container(
       padding: const EdgeInsets.all(20),
       child: Image.asset(
         slide.imagenAsset,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
-          return _buildIconFallback();
+          return _buildIconFallback(); // Fallback genérico
         },
       ),
     );
@@ -162,14 +164,13 @@ class OnboardingSlideWidget extends StatelessWidget {
       width: 240,
       height: 240,
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: const Color(0xFF1a2c5b).withOpacity(0.1),
         borderRadius: BorderRadius.circular(30),
-        border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
       ),
       child: Icon(
         _getIconForSlide(),
         size: 100,
-        color: Colors.white.withOpacity(0.9),
+        color: const Color(0xFF1a2c5b),
       ),
     );
   }
@@ -190,89 +191,71 @@ class OnboardingSlideWidget extends StatelessWidget {
     }
   }
 
-  /// Convierte un string hexadecimal a Color
   Color _hexToColor(String hexString) {
-    try {
+    // Implementación original por si se necesita, aunque ya no usamos el gradiente del slide
+     try {
       final buffer = StringBuffer();
       if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
       buffer.write(hexString.replaceFirst('#', ''));
       return Color(int.parse(buffer.toString(), radix: 16));
     } catch (e) {
-      // Color por defecto si hay error en el parsing
       return const Color(0xFF1a2c5b);
     }
   }
 
   /// Construye los botones de acción para el último slide
   Widget _buildActionButtons(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final isSmallScreen = screenHeight < 700;
-
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         // Botón de Iniciar Sesión (principal)
         SizedBox(
           width: double.infinity,
-          height: isSmallScreen ? 44 : 50,
+          height: 55,
           child: ElevatedButton(
             onPressed: onLoginPressed,
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF1a2c5b),
-              elevation: 2,
-              shadowColor: Colors.black.withOpacity(0.2),
+              backgroundColor: const Color(0xFF1a2c5b), // Azul
+              foregroundColor: Colors.white,
+              elevation: 4,
+              shadowColor: const Color(0xFF1a2c5b).withOpacity(0.3),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(16),
               ),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.login, size: 18),
-                const SizedBox(width: 8),
-                Text(
-                  'Iniciar Sesión',
-                  style: TextStyle(
-                    color: const Color(0xFF1a2c5b),
-                    fontWeight: FontWeight.w600,
-                    fontSize: isSmallScreen ? 14 : 15,
-                  ),
-                ),
-              ],
+            child: const Text(
+              'Iniciar Sesión',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
           ),
         ),
 
-        SizedBox(height: isSmallScreen ? 10 : 12),
+        const SizedBox(height: 16),
 
         // Botón de Registrarse (secundario)
         SizedBox(
           width: double.infinity,
-          height: isSmallScreen ? 44 : 50,
+          height: 55,
           child: OutlinedButton(
             onPressed: onRegisterPressed,
             style: OutlinedButton.styleFrom(
-              foregroundColor: Colors.white,
-              side: const BorderSide(color: Colors.white, width: 1.5),
+              foregroundColor: const Color(0xFF1a2c5b),
+              side: const BorderSide(color: Color(0xFF1a2c5b), width: 2),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(16),
               ),
+              backgroundColor: Colors.white,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.person_add, size: 18, color: Colors.white),
-                const SizedBox(width: 8),
-                Text(
-                  'Registrarse',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                    fontSize: isSmallScreen ? 14 : 15,
-                  ),
-                ),
-              ],
+            child: const Text(
+              'Registrarse',
+              style: TextStyle(
+                color: Color(0xFF1a2c5b),
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
           ),
         ),

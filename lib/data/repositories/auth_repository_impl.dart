@@ -144,4 +144,43 @@ class AuthRepositoryImpl implements AuthRepository {
       return false;
     }
   }
+  @override
+  Future<Map<String, List<String>>> getProvincias() async {
+    try {
+      return await _remoteDataSource.getProvincias();
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<Map<String, dynamic>> registerUser({
+    required String nombres,
+    required String apellidos,
+    required String email,
+    required String celular,
+    required String matricula,
+    required String password,
+    required String provincia,
+    required String ciudad,
+    required bool aceptoPrivacidad,
+    required String filePath,
+  }) async {
+    try {
+      return await _remoteDataSource.registerUser(
+        nombres: nombres,
+        apellidos: apellidos,
+        email: email,
+        celular: celular,
+        matricula: matricula,
+        password: password,
+        provincia: provincia,
+        ciudad: ciudad,
+        aceptoPrivacidad: aceptoPrivacidad,
+        filePath: filePath,
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -128,4 +128,114 @@ class AuthRemoteDataSource {
       // para permitir logout local
     }
   }
+
+  /// Obtiene el catálogo de provincias y ciudades
+  Future<Map<String, List<String>>> getProvincias() async {
+    try {
+      final response = await _dio.get(
+        ApiConstants.REGISTER_APP_ENDPOINT,
+        queryParameters: {'action': 'provincias'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['success'] == true) {
+          final Map<String, dynamic> rawData = data['data'];
+          final Map<String, List<String>> result = {};
+          
+          rawData.forEach((key, value) {
+            if (value is List) {
+              result[key] = List<String>.from(value);
+            }
+          });
+          
+          return result;
+        } else {
+          throw Exception(data['message'] ?? 'Error al obtener provincias');
+        }
+      } else {
+        throw Exception('Error del servidor: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error al cargar provincias: $e');
+    }
+  }
+
+  /// Registra un nuevo usuario
+  Future<Map<String, dynamic>> registerUser({
+    required String nombres,
+    required String apellidos,
+    required String email,
+    required String celular,
+    required String matricula,
+    required String password,
+    required String provincia,
+    required String ciudad,
+    required bool aceptoPrivacidad,
+    required String filePath,
+  }) async {
+    try {
+      String fileName = filePath.split('/').last;
+      
+      final formData = FormData.fromMap({
+        'nombres': nombres,
+        'apellidos': apellidos,
+        'email': email,
+        'celular': celular,
+        'matricula_inmobiliaria': matricula,
+        'user_password': password,
+        'provincia': provincia,
+        'ciudad': ciudad,
+        'acepto_privacidad': aceptoPrivacidad ? 'on' : 'off', // Backend expects 'on', 'true', or '1'
+        'documento': await MultipartFile.fromFile(filePath, filename: fileName),
+      });
+
+      final response = await _dio.post(
+        ApiConstants.REGISTER_APP_ENDPOINT,
+        queryParameters: {'action': 'registrar'},
+        data: formData,
+        options: Options(
+          headers: {'Content-Type': 'multipart/form-data'},
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = response.data;
+        if (data['success'] == true) {
+          return data['data'] ?? {};
+        } else {
+          // Si hay array de errores, los unimos
+          String msg = data['message'] ?? 'Error en el registro';
+          if (data['errors'] != null && (data['errors'] as List).isNotEmpty) {
+             msg += ': ' + (data['errors'] as List).join(', ');
+          }
+          throw Exception(msg);
+        }
+      } else if (response.statusCode == 422 || response.statusCode == 409) {
+          final data = response.data;
+          String msg = data['message'] ?? 'Error de validación';
+           if (data['errors'] != null && (data['errors'] as List).isNotEmpty) {
+             msg += ': ' + (data['errors'] as List).join(', ');
+          }
+          throw Exception(msg);
+      } else {
+        throw Exception('Error del servidor: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+       if (e.response != null) {
+          final data = e.response?.data;
+           if (data is Map && data['message'] != null) {
+              String msg = data['message'];
+               if (data['errors'] != null && (data['errors'] as List).isNotEmpty) {
+                 msg += ': ' + (data['errors'] as List).join(', ');
+              }
+              throw Exception(msg);
+           }
+       }
+       throw Exception('Error de conexión o servidor: ${e.message}');
+    } catch (e) {
+      throw Exception('Error inesperado en registro: $e');
+    }
+  }
 }
+

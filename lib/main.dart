@@ -9,7 +9,9 @@ import 'presentation/pages/gestion_propiedades_page.dart';
 import 'presentation/pages/propiedad_detalle_page_v2.dart';
 import 'presentation/pages/mi_red_page.dart';
 import 'presentation/pages/subir_propiedad_page.dart';
+import 'presentation/pages/registro_page.dart';
 import 'presentation/bindings/feed_binding.dart';
+import 'presentation/bindings/initial_binding.dart';
 import 'core/theme/app_theme.dart';
 
 void main() {
@@ -24,6 +26,7 @@ class TriaraApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'BIE - Asesores Inmobiliarios',
       theme: AppTheme.lightTheme,
+      initialBinding: InitialBinding(),
       initialRoute: '/splash',
       getPages: [
         GetPage(name: '/splash', page: () => const SplashPage()),
@@ -35,13 +38,7 @@ class TriaraApp extends StatelessWidget {
               Get.toNamed('/login');
             },
             onRegisterPressed: () {
-              Get.snackbar(
-                'Registro',
-                'La función de registro estará disponible próximamente',
-                backgroundColor: Colors.orange,
-                colorText: Colors.white,
-                icon: const Icon(Icons.info, color: Colors.white),
-              );
+              Get.to(() => const RegistroPage());
             },
           ),
         ),

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../controllers/onboarding_controller.dart';
-import '../controllers/app_init_controller.dart';
 import '../widgets/onboarding_slide_widget.dart';
+import 'registro_page.dart';
 import '../widgets/onboarding_page_indicator_widget.dart';
 import '../../domain/use_cases/get_onboarding_slides_use_case.dart';
 import '../../data/repositories/onboarding_repository_impl.dart';
@@ -210,18 +211,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
   void _handleLoginPressed() async {
     // Marcar que ya no es la primera vez
     try {
-      final appInitController = Get.find<AppInitController>();
-      await appInitController.markFirstTimeComplete();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_first_time', false);
     } catch (e) {
-      // Si no existe el controlador, crearlo
-      final appInitController = Get.put(AppInitController());
-      await appInitController.markFirstTimeComplete();
+      print('Error saving preferences: $e');
     }
 
     if (widget.onLoginPressed != null) {
       widget.onLoginPressed!();
     } else {
-      // Navegación por defecto a la página de login usando GetX
       Get.toNamed('/login');
     }
   }
@@ -230,19 +228,16 @@ class _OnboardingPageState extends State<OnboardingPage> {
   void _handleRegisterPressed() async {
     // Marcar que ya no es la primera vez
     try {
-      final appInitController = Get.find<AppInitController>();
-      await appInitController.markFirstTimeComplete();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('is_first_time', false);
     } catch (e) {
-      // Si no existe el controlador, crearlo
-      final appInitController = Get.put(AppInitController());
-      await appInitController.markFirstTimeComplete();
+      print('Error saving preferences: $e');
     }
 
     if (widget.onRegisterPressed != null) {
       widget.onRegisterPressed!();
     } else {
-      // Navegación por defecto a la página de registro
-      Navigator.of(context).pushReplacementNamed('/register');
+      Get.to(() => const  RegistroPage());
     }
   }
 }

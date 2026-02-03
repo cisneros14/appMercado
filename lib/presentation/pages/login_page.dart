@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../controllers/login_controller.dart';
+import 'registro_page.dart';
 
 /// Página de login para asesores inmobiliarios.
 ///
@@ -36,27 +37,14 @@ class LoginPage extends StatelessWidget {
                 child: Column(
                   children: [
                     Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(
-                        Icons.business,
-                        size: 40,
-                        color: Color(0xFF1a2c5b),
+                      width: 150,
+                      height: 150,
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const Text(
-                      'BIE',
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
                     const SizedBox(height: 8),
                     const Text(
                       'Plataforma para Asesores Inmobiliarios',
@@ -200,27 +188,7 @@ class LoginPage extends StatelessWidget {
 
                     const SizedBox(height: 16),
 
-                    // Botón de test de conectividad (solo para debug)
-                    SizedBox(
-                      width: double.infinity,
-                      height: 40,
-                      child: OutlinedButton(
-                        onPressed: controller.testConnectivity,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white70,
-                          side: const BorderSide(color: Colors.white70),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                        child: const Text(
-                          'Probar Conectividad',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                      ),
-                    ),
 
-                    const SizedBox(height: 20),
 
                     // Enlaces adicionales
                     Row(
@@ -238,53 +206,29 @@ class LoginPage extends StatelessWidget {
                         ),
                       ],
                     ),
-
-                    // Botón temporal para desarrollo - resetear BD
-                    TextButton(
-                      onPressed: controller.resetDatabaseForDevelopment,
-                      child: const Text(
-                        '🔧 Reset BD (DEV)',
-                        style: TextStyle(color: Colors.orange, fontSize: 12),
-                      ),
-                    ),
-
-                    const SizedBox(height: 40),
-
-                    // Información adicional
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        children: [
-                          const Icon(
-                            Icons.info_outline,
-                            color: Colors.white70,
-                            size: 24,
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Solo para Asesores Registrados',
+                    const SizedBox(height: 8),
+                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          '¿No tienes cuenta? ',
+                          style: TextStyle(color: Colors.white70),
+                        ),
+                        TextButton(
+                          onPressed: () => Get.to(() => const RegistroPage()),
+                          child: const Text(
+                            'Regístrate aquí',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 16,
                               fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Esta plataforma está diseñada exclusivamente para asesores inmobiliarios certificados.',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+
+
                   ],
                 ),
               ),

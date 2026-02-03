@@ -18,6 +18,9 @@ class ApiConstants {
   /// Endpoint para registro de usuarios (si existe)
   static const String REGISTER_ENDPOINT = '${BASE_URL}register.php';
 
+  /// Endpoint específico para registro desde la App
+  static const String REGISTER_APP_ENDPOINT = '${BASE_URL}api_registro_app.php';
+
   /// Endpoint para verificar token (si existe)
   static const String VERIFY_TOKEN_ENDPOINT = '${BASE_URL}verify_token.php';
 

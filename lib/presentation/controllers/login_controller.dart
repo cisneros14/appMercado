@@ -161,11 +161,12 @@ class LoginController extends GetxController {
       Get.offAllNamed('/home');
     } catch (e) {
       // Mostrar error
-      _loginError.value = e.toString();
+      final errorMessage = e.toString().replaceAll('Exception: ', '');
+      _loginError.value = errorMessage;
 
       Get.snackbar(
         'Error de Login',
-        e.toString(),
+        errorMessage,
         backgroundColor: Colors.red,
         colorText: Colors.white,
         icon: const Icon(Icons.error, color: Colors.white),
@@ -187,8 +188,13 @@ class LoginController extends GetxController {
   }
 
   /// Vuelve a la pantalla anterior
+  /// Vuelve a la pantalla anterior o al onboarding
   void goBack() {
-    Get.back();
+    if (Get.key.currentState?.canPop() ?? false) {
+      Get.back();
+    } else {
+      Get.offAllNamed('/onboarding');
+    }
   }
 
   /// Marca la app como no primera vez usando el AppInitController
