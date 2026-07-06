@@ -44,7 +44,7 @@ class PropiedadRepositoryImpl implements PropiedadRepository {
       perPage: limite,
     );
 
-    final dynamic rawPropiedades = raw is Map ? raw['propiedades'] : [];
+    final dynamic rawPropiedades = raw['propiedades'];
     final List rawList = rawPropiedades is List ? rawPropiedades : [];
 
     var propiedades = rawList
@@ -265,7 +265,7 @@ class PropiedadRepositoryImpl implements PropiedadRepository {
   @override
   Future<List<PropiedadEntity>> buscarPropiedades(String termino) async {
     final raw = await remoteDataSource.listarPropiedades(q: termino);
-    final dynamic rawPropiedades = raw is Map ? raw['propiedades'] : [];
+    final dynamic rawPropiedades = raw['propiedades'];
     final List rawList = rawPropiedades is List ? rawPropiedades : [];
 
     final propiedades = rawList
@@ -286,7 +286,7 @@ class PropiedadRepositoryImpl implements PropiedadRepository {
       mine: true,
     );
 
-    final dynamic rawPropiedades = raw is Map ? raw['propiedades'] : [];
+    final dynamic rawPropiedades = raw['propiedades'];
     final List rawList = rawPropiedades is List ? rawPropiedades : [];
 
     final propiedades = rawList
@@ -423,8 +423,11 @@ class PropiedadRepositoryImpl implements PropiedadRepository {
     } else if (rawAmenities is Map) {
         // En algunos casos raros podría venir como mapa indexado
         rawAmenities.forEach((k, v) {
-            if (v is Map) amenidades.add(v['id']?.toString() ?? '');
-            else amenidades.add(v.toString());
+            if (v is Map) {
+              amenidades.add(v['id']?.toString() ?? '');
+            } else {
+              amenidades.add(v.toString());
+            }
         });
     }
 
@@ -453,9 +456,13 @@ class PropiedadRepositoryImpl implements PropiedadRepository {
       amenidades: amenidades,
       moneda: moneda,
       corredorId: '${corredorMap['id'] ?? json['id_corredor'] ?? ''}',
-      corredorNombre: corredorMap['nombre']?.toString() ?? json['nombre_corredor']?.toString() ?? 'Asesor',
-      corredorImagen: normalizeImage(corredorMap['imagen']?.toString() ?? ''),
+      corredorNombre: json['corredor_nombre']?.toString() ?? corredorMap['nombre']?.toString() ?? json['nombre_corredor']?.toString() ?? 'Asesor',
+      corredorImagen: normalizeImage(json['corredor_img']?.toString() ?? corredorMap['imagen']?.toString() ?? ''),
       corredorImagenPlaceholder: corredorMap['imagen_placeholder']?.toString() ?? '',
+      corredorTelefono: json['corredor_telefono']?.toString() ?? corredorMap['telefono']?.toString() ?? '',
+      corredorEmail: json['corredor_email']?.toString() ?? corredorMap['email']?.toString() ?? '',
+      corredorEmpresa: json['corredor_empresa']?.toString() ?? corredorMap['empresa']?.toString() ?? '',
+      corredorCargo: json['corredor_cargo']?.toString() ?? corredorMap['cargo']?.toString() ?? '',
       urlDetalle: urlDet,
       fechaPublicacion: DateTime.tryParse(json['fecha_publicacion']?.toString() ?? '') ?? DateTime.now(),
       activa: json['estado']?.toString() == '1',

@@ -2,6 +2,7 @@
 /// 
 /// Este archivo contiene todas las constantes utilizadas en la aplicación
 /// siguiendo la nomenclatura SCREAMING_SNAKE_CASE para constantes.
+library;
 
 class AppConstants {
   // URL Base de la API

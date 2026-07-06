@@ -48,8 +48,9 @@ class _SmartNetworkImageState extends State<SmartNetworkImage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_candidates.isEmpty)
+    if (_candidates.isEmpty) {
       return widget.placeholder ?? const SizedBox.shrink();
+    }
 
     final url = _candidates[_idx];
     print('🖼️ SmartNetworkImage: Intentando cargar ($_idx/${_candidates.length}): $url');

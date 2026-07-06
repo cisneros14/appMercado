@@ -2,6 +2,7 @@
 /// 
 /// Define la estructura común para el manejo de errores
 /// en toda la aplicación Triara.
+library;
 
 abstract class AppException implements Exception {
   final String message;
@@ -15,30 +16,30 @@ abstract class AppException implements Exception {
 
 /// Excepción para errores de conexión de red
 class NetworkException extends AppException {
-  const NetworkException(String message, [String? code]) : super(message, code);
+  const NetworkException(super.message, [super.code]);
 }
 
 /// Excepción para errores del servidor
 class ServerException extends AppException {
-  const ServerException(String message, [String? code]) : super(message, code);
+  const ServerException(super.message, [super.code]);
 }
 
 /// Excepción para errores de autenticación
 class AuthException extends AppException {
-  const AuthException(String message, [String? code]) : super(message, code);
+  const AuthException(super.message, [super.code]);
 }
 
 /// Excepción para errores de validación
 class ValidationException extends AppException {
-  const ValidationException(String message, [String? code]) : super(message, code);
+  const ValidationException(super.message, [super.code]);
 }
 
 /// Excepción para recursos no encontrados
 class NotFoundException extends AppException {
-  const NotFoundException(String message, [String? code]) : super(message, code);
+  const NotFoundException(super.message, [super.code]);
 }
 
 /// Excepción para errores de caché
 class CacheException extends AppException {
-  const CacheException(String message, [String? code]) : super(message, code);
+  const CacheException(super.message, [super.code]);
 }

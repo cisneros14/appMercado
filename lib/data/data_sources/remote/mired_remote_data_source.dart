@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 import '../../../core/constants/api_constants.dart';
@@ -64,30 +65,51 @@ class MiRedRemoteDataSource {
     dynamic raw,
     List<String> candidates,
   ) {
+    print('DEBUG_MIRED: _extractListFromResponse candidates=$candidates type=${raw.runtimeType}');
     try {
-      if (raw is List) {
-        return List<Map<String, dynamic>>.from(List.from(raw));
+      if (raw is String) {
+        print('DEBUG_MIRED: raw is String, attempting jsonDecode...');
+        try {
+          raw = jsonDecode(raw);
+          print('DEBUG_MIRED: jsonDecode success. New type=${raw.runtimeType}');
+        } catch (e) {
+          print('DEBUG_MIRED: Error decoding JSON string: $e');
+        }
       }
-      if (raw is Map<String, dynamic>) {
+
+      if (raw is List) {
+        print('DEBUG_MIRED: raw is List, returning direct map');
+        return raw.map((e) => Map<String, dynamic>.from(e)).toList();
+      }
+      
+      if (raw is Map) {
+         print('DEBUG_MIRED: raw is Map. Keys=${raw.keys.toList()}');
         // Priorizar claves candidatas
         for (final k in candidates) {
           if (raw.containsKey(k) && raw[k] is List) {
-            return List<Map<String, dynamic>>.from(List.from(raw[k]));
+            print('DEBUG_MIRED: Found candidate key: $k');
+            final list = raw[k] as List;
+            return list.map((e) => Map<String, dynamic>.from(e)).toList();
           }
         }
         // Tomar la primera clave que sea lista
         for (final entry in raw.entries) {
           if (entry.value is List) {
-            return List<Map<String, dynamic>>.from(List.from(entry.value));
+            print('DEBUG_MIRED: Found fallback list key: ${entry.key}');
+             final list = entry.value as List;
+             return list.map((e) => Map<String, dynamic>.from(e)).toList();
           }
         }
+        print('DEBUG_MIRED: No list found in Map');
       }
     } catch (e) {
+      print('DEBUG_MIRED: Error parsing response: $e');
       developer.log(
         'MiRedRemoteDataSource._extractListFromResponse -> error parse: $e',
         name: 'MiRedRemoteDataSource',
       );
     }
+    print('DEBUG_MIRED: Returning empty list');
     return <Map<String, dynamic>>[];
   }
 
@@ -181,5 +203,59 @@ class MiRedRemoteDataSource {
     throw Exception(
       'Error al obtener invitaciones (status ${resp.statusCode})',
     );
+  }
+
+  /// Envía una invitación a otro agente.
+  Future<bool> enviarInvitacion(int idVendedor) async {
+    final userId = await _getCurrentUserId();
+    developer.log(
+      'MiRedRemoteDataSource.enviarInvitacion -> user_id=$userId id_vendedor=$idVendedor',
+      name: 'MiRedRemoteDataSource',
+    );
+    final resp = await _getWithFallback('enviar_invitacion', {
+      'user_id': userId,
+      'id_vendedor': idVendedor,
+    });
+    if (resp.statusCode == 200) {
+      final raw = resp.data;
+      if (raw is Map) {
+        return raw['success'] == true;
+      }
+    }
+    return false;
+  }
+
+  /// Acepta una invitación de conexión.
+  Future<bool> aceptarInvitacion(int idMired) async {
+    final userId = await _getCurrentUserId();
+    final resp = await _getWithFallback('procesar_invitacion', {
+      'user_id': userId,
+      'id_mired': idMired,
+      'accion': 'aceptar',
+    });
+    if (resp.statusCode == 200) {
+      final raw = resp.data;
+      if (raw is Map) {
+        return raw['success'] == true;
+      }
+    }
+    return false;
+  }
+
+  /// Rechaza una invitación de conexión.
+  Future<bool> rechazarInvitacion(int idMired) async {
+    final userId = await _getCurrentUserId();
+    final resp = await _getWithFallback('procesar_invitacion', {
+      'user_id': userId,
+      'id_mired': idMired,
+      'accion': 'rechazar',
+    });
+    if (resp.statusCode == 200) {
+      final raw = resp.data;
+      if (raw is Map) {
+        return raw['success'] == true;
+      }
+    }
+    return false;
   }
 }

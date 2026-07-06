@@ -4,8 +4,6 @@ import 'package:get/get.dart';
 import 'package:file_picker/file_picker.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../data/repositories/auth_repository_impl.dart';
-import '../../data/data_sources/remote/auth_remote_datasource.dart';
-import '../../data/data_sources/local/auth_local_datasource.dart';
 
 class RegistroController extends GetxController {
   final AuthRepository _authRepository;

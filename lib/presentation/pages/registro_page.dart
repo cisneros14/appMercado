@@ -186,7 +186,7 @@ class RegistroPage extends StatelessWidget {
                         Checkbox(
                           value: controller.aceptoPrivacidad.value,
                           onChanged: (v) => controller.aceptoPrivacidad.value = v ?? false,
-                          fillColor: MaterialStateProperty.all(Colors.white),
+                          fillColor: WidgetStateProperty.all(Colors.white),
                           checkColor: const Color(0xFF1a2c5b),
                         ),
                         const Expanded(
@@ -271,7 +271,7 @@ class RegistroPage extends StatelessWidget {
     bool enabled = true,
   }) {
     return DropdownButtonFormField<String>(
-      value: items.contains(value) ? value : null,
+      initialValue: items.contains(value) ? value : null,
       onChanged: enabled ? onChanged : null,
       decoration: InputDecoration(
         labelText: isLoading ? 'Cargando $label...' : label,

@@ -36,7 +36,7 @@ class LoginPage extends StatelessWidget {
               Center(
                 child: Column(
                   children: [
-                    Container(
+                    SizedBox(
                       width: 150,
                       height: 150,
                       child: Image.asset(

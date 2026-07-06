@@ -1,14 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:collection/collection.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../domain/entities/propiedad_entity.dart';
 import '../../data/data_sources/remote/propiedad_remote_data_source.dart';
 import '../../data/repositories/propiedad_repository_impl.dart';
 import '../../core/widgets/smart_network_image.dart';
-import '../../core/utils/image_utils.dart';
 import '../../core/widgets/screen_header_description.dart';
 
 class SubirPropiedadPage extends StatefulWidget {
@@ -58,7 +56,7 @@ class _SubirPropiedadPageState extends State<SubirPropiedadPage> {
 
   // Images
   File? _imagenPrincipal;
-  List<File> _galeria = [];
+  final List<File> _galeria = [];
   
   // Existing Images (Edit Mode)
   String? _existingImagenPrincipalUrl;
@@ -397,7 +395,7 @@ class _SubirPropiedadPageState extends State<SubirPropiedadPage> {
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(labelText: 'Tipo de Inmueble'),
-                    value: _tipoId,
+                    initialValue: _tipoId,
                     items: _tipos.map((e) => DropdownMenuItem(
                       value: e['id'].toString(),
                       child: Text(e['nombre']),
@@ -440,7 +438,7 @@ class _SubirPropiedadPageState extends State<SubirPropiedadPage> {
                   _SectionHeader(title: 'Ubicación'),
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(labelText: 'Provincia'),
-                    value: _provinciaId,
+                    initialValue: _provinciaId,
                     items: _provincias.map((e) => DropdownMenuItem(
                       value: e['id'].toString(),
                       child: Text(e['nombre']),
@@ -451,7 +449,7 @@ class _SubirPropiedadPageState extends State<SubirPropiedadPage> {
                   const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     decoration: const InputDecoration(labelText: 'Cantón'),
-                    value: _cantonId,
+                    initialValue: _cantonId,
                     items: _cantones.map((e) => DropdownMenuItem(
                       value: e['id'].toString(),
                       child: Text(e['nombre']),
@@ -568,8 +566,11 @@ class _SubirPropiedadPageState extends State<SubirPropiedadPage> {
                         selected: selected,
                         onSelected: (val) {
                           setState(() {
-                            if (val) _amenidadesSeleccionadas.add(id);
-                            else _amenidadesSeleccionadas.remove(id);
+                            if (val) {
+                              _amenidadesSeleccionadas.add(id);
+                            } else {
+                              _amenidadesSeleccionadas.remove(id);
+                            }
                           });
                         },
                       );

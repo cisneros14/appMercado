@@ -2,6 +2,7 @@
 /// 
 /// Representa errores que pueden ser mostrados al usuario
 /// de manera comprensible y amigable.
+library;
 
 abstract class Failure {
   final String message;
@@ -15,30 +16,30 @@ abstract class Failure {
 
 /// Falla de conexión de red
 class NetworkFailure extends Failure {
-  const NetworkFailure([String message = 'Error de conexión de red']) : super(message);
+  const NetworkFailure([super.message = 'Error de conexión de red']);
 }
 
 /// Falla del servidor
 class ServerFailure extends Failure {
-  const ServerFailure([String message = 'Error del servidor']) : super(message);
+  const ServerFailure([super.message = 'Error del servidor']);
 }
 
 /// Falla de autenticación
 class AuthFailure extends Failure {
-  const AuthFailure([String message = 'Error de autenticación']) : super(message);
+  const AuthFailure([super.message = 'Error de autenticación']);
 }
 
 /// Falla de validación
 class ValidationFailure extends Failure {
-  const ValidationFailure([String message = 'Datos inválidos']) : super(message);
+  const ValidationFailure([super.message = 'Datos inválidos']);
 }
 
 /// Falla de recurso no encontrado
 class NotFoundFailure extends Failure {
-  const NotFoundFailure([String message = 'Recurso no encontrado']) : super(message);
+  const NotFoundFailure([super.message = 'Recurso no encontrado']);
 }
 
 /// Falla de caché
 class CacheFailure extends Failure {
-  const CacheFailure([String message = 'Error de almacenamiento local']) : super(message);
+  const CacheFailure([super.message = 'Error de almacenamiento local']);
 }

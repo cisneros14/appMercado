@@ -2,6 +2,7 @@
 /// 
 /// Define la estructura de datos de un usuario en el dominio
 /// de la aplicación.
+library;
 
 class UsuarioEntity {
   final String id;

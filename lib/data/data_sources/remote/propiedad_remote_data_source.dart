@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:dio/dio.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/config/app_config.dart';
+import '../local/auth_local_datasource.dart';
 
 /// Data source remoto para consumo del endpoint de propiedades
 /// ubicado en `https://mercadoinmobiliario.ec/admin/apis/propiedades.php`.
@@ -12,12 +12,28 @@ import '../../../core/config/app_config.dart';
 class PropiedadRemoteDataSource {
   static const String TERRA_API_FILENAME = 'api_sistema_terra.php';
   final Dio _dio;
+  final AuthLocalDataSource _authLocalDataSource;
 
-  PropiedadRemoteDataSource({Dio? dio})
-    : _dio = dio ?? AppConfig.createDioClient() {
+  PropiedadRemoteDataSource({Dio? dio, AuthLocalDataSource? authLocalDataSource})
+      : _dio = dio ?? AppConfig.createDioClient(),
+        _authLocalDataSource = authLocalDataSource ?? AuthLocalDataSource() {
     // Asegurar baseUrl si se inyecta un Dio externo sin configurarla
     if (_dio.options.baseUrl.isEmpty) {
       _dio.options.baseUrl = ApiConstants.BASE_URL;
+    }
+  }
+
+  /// Obtiene el ID del usuario actual
+  Future<String> _getUserId() async {
+    try {
+      final user = await _authLocalDataSource.getCurrentUser();
+      if (user != null) {
+        return user.userId.toString();
+      }
+      return '1'; // Fallback a admin si no hay sesión (comportamiento legacy)
+    } catch (e) {
+      print('⚠️ Error obteniendo ID de usuario para API: $e');
+      return '1';
     }
   }
 
@@ -35,10 +51,12 @@ class PropiedadRemoteDataSource {
     int perPage = 20,
     bool mine = false,
   }) async {
+    final userId = await _getUserId();
     final params = <String, dynamic>{
       'action': 'listar',
       'page': page,
       'per_page': perPage,
+      'id_usuario': userId,
     };
 
     if (q != null && q.isNotEmpty) params['q'] = q;
@@ -47,8 +65,6 @@ class PropiedadRemoteDataSource {
     if (provincia != null) params['provincia'] = provincia;
     if (canton != null) params['canton'] = canton;
     if (ciudad != null) params['ciudad'] = ciudad;
-    if (precioDesde != null) params['precio_desde'] = precioDesde;
-    if (precioHasta != null) params['precio_hasta'] = precioHasta;
     if (precioDesde != null) params['precio_desde'] = precioDesde;
     if (precioHasta != null) params['precio_hasta'] = precioHasta;
     
@@ -147,12 +163,17 @@ class PropiedadRemoteDataSource {
   Future<Map<String, dynamic>?> guardarPropiedad(Map<String, dynamic> data) async {
     final isEdit = data.containsKey('id') && data['id'] != null;
     final action = isEdit ? 'editar' : 'crear';
+    final userId = await _getUserId();
 
     final formData = FormData();
+    
+    // Add User ID
+    formData.fields.add(MapEntry('id_usuario', userId));
+
     data.forEach((key, value) {
       if (value is List) {
         for (var item in value) {
-          formData.fields.add(MapEntry('${key}[]', item.toString()));
+          formData.fields.add(MapEntry('$key[]', item.toString()));
         }
       } else if (value != null) {
         formData.fields.add(MapEntry(key, value.toString()));
@@ -171,8 +192,10 @@ class PropiedadRemoteDataSource {
 
   /// Sube la imagen principal de una propiedad
   Future<Map<String, dynamic>?> subirImagenPrincipal(int id, String filePath) async {
+    final userId = await _getUserId();
     final formData = FormData.fromMap({
       'id': id,
+      'id_usuario': userId,
       'imagen': await MultipartFile.fromFile(filePath),
     });
 
@@ -188,8 +211,10 @@ class PropiedadRemoteDataSource {
 
   /// Sube múltiples fotos a la galería
   Future<Map<String, dynamic>?> subirGaleria(int id, List<String> filePaths) async {
+    final userId = await _getUserId();
     final formData = FormData.fromMap({
       'id': id,
+      'id_usuario': userId,
     });
 
     for (var path in filePaths) {

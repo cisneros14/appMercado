@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+import 'dart:async';
 import 'package:get/get.dart';
 import '../../data/data_sources/remote/mired_remote_data_source.dart';
 
@@ -87,6 +88,20 @@ class MiRedController extends GetxController {
     }
   }
 
+  Timer? _debounce;
+
+  void onSearchChanged(String val) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      fetchAgentes(busqueda: val);
+    });
+  }
+  
+  @override
+  void onClose() {
+    _debounce?.cancel();
+    super.onClose();
+  }
   Future<void> fetchInvitaciones() async {
     try {
       isLoadingInvitaciones.value = true;
@@ -96,6 +111,45 @@ class MiRedController extends GetxController {
       developer.log('Error fetchInvitaciones: $e', name: 'MiRedController');
     } finally {
       isLoadingInvitaciones.value = false;
+    }
+  }
+
+  Future<bool> enviarInvitacion(int idVendedor) async {
+    try {
+      final success = await _remote.enviarInvitacion(idVendedor);
+      if (success) {
+        await fetchAgentes();
+      }
+      return success;
+    } catch (e) {
+      developer.log('Error enviarInvitacion: $e', name: 'MiRedController');
+      return false;
+    }
+  }
+
+  Future<bool> aceptarInvitacion(int idMired) async {
+    try {
+      final success = await _remote.aceptarInvitacion(idMired);
+      if (success) {
+        await fetchAll();
+      }
+      return success;
+    } catch (e) {
+      developer.log('Error aceptarInvitacion: $e', name: 'MiRedController');
+      return false;
+    }
+  }
+
+  Future<bool> rechazarInvitacion(int idMired) async {
+    try {
+      final success = await _remote.rechazarInvitacion(idMired);
+      if (success) {
+        await fetchInvitaciones();
+      }
+      return success;
+    } catch (e) {
+      developer.log('Error rechazarInvitacion: $e', name: 'MiRedController');
+      return false;
     }
   }
 }

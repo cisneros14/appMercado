@@ -111,7 +111,7 @@ class OnboardingSlideWidget extends StatelessWidget {
 
   /// Construye la imagen del slide con fallback
   Widget _buildImage() {
-    return Container(width: double.infinity, child: _buildImageContent());
+    return SizedBox(width: double.infinity, child: _buildImageContent());
   }
 
   /// Construye el contenido específico de la imagen
@@ -188,18 +188,6 @@ class OnboardingSlideWidget extends StatelessWidget {
         return Icons.rocket_launch;
       default:
         return Icons.info;
-    }
-  }
-
-  Color _hexToColor(String hexString) {
-    // Implementación original por si se necesita, aunque ya no usamos el gradiente del slide
-     try {
-      final buffer = StringBuffer();
-      if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
-      buffer.write(hexString.replaceFirst('#', ''));
-      return Color(int.parse(buffer.toString(), radix: 16));
-    } catch (e) {
-      return const Color(0xFF1a2c5b);
     }
   }
 

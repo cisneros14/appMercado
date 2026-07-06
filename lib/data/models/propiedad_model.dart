@@ -14,6 +14,7 @@ class PropiedadModel extends PropiedadEntity {
     required super.tipoOperacion,
     required super.tipoPropiedad,
     required super.area,
+    required super.areaLote,
     required super.habitaciones,
     required super.banos,
     required super.direccion,
@@ -23,6 +24,14 @@ class PropiedadModel extends PropiedadEntity {
     required super.fechaPublicacion,
     required super.activa,
     super.propietarioId,
+    super.corredorId,
+    super.corredorNombre,
+    super.corredorImagen,
+    super.corredorImagenPlaceholder,
+    super.corredorTelefono,
+    super.corredorEmail,
+    super.corredorEmpresa,
+    super.corredorCargo,
   });
   
   /// Crea una instancia desde JSON
@@ -35,6 +44,7 @@ class PropiedadModel extends PropiedadEntity {
       tipoOperacion: json['tipo_operacion'] as String,
       tipoPropiedad: json['tipo_propiedad'] as String,
       area: (json['area'] as num).toDouble(),
+      areaLote: (json['area_lote'] as num).toDouble(),
       habitaciones: json['habitaciones'] as int,
       banos: json['banos'] as int,
       direccion: json['direccion'] as String,
@@ -44,6 +54,14 @@ class PropiedadModel extends PropiedadEntity {
       fechaPublicacion: DateTime.parse(json['fecha_publicacion'] as String),
       activa: json['activa'] as bool,
       propietarioId: json['propietario_id'] as String?,
+      corredorId: json['id_corredor']?.toString() ?? json['corredor_id']?.toString() ?? '',
+      corredorNombre: json['corredor_nombre'] as String? ?? json['nombre_corredor'] as String? ?? '',
+      corredorImagen: json['corredor_img'] as String? ?? json['corredor_imagen'] as String? ?? '',
+      corredorImagenPlaceholder: json['corredor_imagen_placeholder'] as String? ?? '',
+      corredorTelefono: json['corredor_telefono'] as String? ?? json['telefono_contacto'] as String? ?? '',
+      corredorEmail: json['corredor_email'] as String? ?? json['user_email'] as String? ?? '',
+      corredorEmpresa: json['corredor_empresa'] as String? ?? json['empresa'] as String? ?? '',
+      corredorCargo: json['corredor_cargo'] as String? ?? json['cargo'] as String? ?? '',
     );
   }
   
@@ -57,6 +75,7 @@ class PropiedadModel extends PropiedadEntity {
       'tipo_operacion': tipoOperacion,
       'tipo_propiedad': tipoPropiedad,
       'area': area,
+      'area_lote': areaLote,
       'habitaciones': habitaciones,
       'banos': banos,
       'direccion': direccion,
@@ -66,6 +85,14 @@ class PropiedadModel extends PropiedadEntity {
       'fecha_publicacion': fechaPublicacion.toIso8601String(),
       'activa': activa,
       'propietario_id': propietarioId,
+      'id_corredor': corredorId,
+      'corredor_nombre': corredorNombre,
+      'corredor_img': corredorImagen,
+      'corredor_imagen_placeholder': corredorImagenPlaceholder,
+      'corredor_telefono': corredorTelefono,
+      'corredor_email': corredorEmail,
+      'corredor_empresa': corredorEmpresa,
+      'corredor_cargo': corredorCargo,
     };
   }
   
@@ -78,6 +105,7 @@ class PropiedadModel extends PropiedadEntity {
     String? tipoOperacion,
     String? tipoPropiedad,
     double? area,
+    double? areaLote,
     int? habitaciones,
     int? banos,
     String? direccion,
@@ -87,6 +115,14 @@ class PropiedadModel extends PropiedadEntity {
     DateTime? fechaPublicacion,
     bool? activa,
     String? propietarioId,
+    String? corredorId,
+    String? corredorNombre,
+    String? corredorImagen,
+    String? corredorImagenPlaceholder,
+    String? corredorTelefono,
+    String? corredorEmail,
+    String? corredorEmpresa,
+    String? corredorCargo,
   }) {
     return PropiedadModel(
       id: id ?? this.id,
@@ -96,6 +132,7 @@ class PropiedadModel extends PropiedadEntity {
       tipoOperacion: tipoOperacion ?? this.tipoOperacion,
       tipoPropiedad: tipoPropiedad ?? this.tipoPropiedad,
       area: area ?? this.area,
+      areaLote: areaLote ?? this.areaLote,
       habitaciones: habitaciones ?? this.habitaciones,
       banos: banos ?? this.banos,
       direccion: direccion ?? this.direccion,
@@ -105,6 +142,14 @@ class PropiedadModel extends PropiedadEntity {
       fechaPublicacion: fechaPublicacion ?? this.fechaPublicacion,
       activa: activa ?? this.activa,
       propietarioId: propietarioId ?? this.propietarioId,
+      corredorId: corredorId ?? this.corredorId,
+      corredorNombre: corredorNombre ?? this.corredorNombre,
+      corredorImagen: corredorImagen ?? this.corredorImagen,
+      corredorImagenPlaceholder: corredorImagenPlaceholder ?? this.corredorImagenPlaceholder,
+      corredorTelefono: corredorTelefono ?? this.corredorTelefono,
+      corredorEmail: corredorEmail ?? this.corredorEmail,
+      corredorEmpresa: corredorEmpresa ?? this.corredorEmpresa,
+      corredorCargo: corredorCargo ?? this.corredorCargo,
     );
   }
 }

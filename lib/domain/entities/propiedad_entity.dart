@@ -2,6 +2,7 @@
 ///
 /// Define la estructura de datos de una propiedad en el dominio
 /// de la aplicación, independiente de la fuente de datos.
+library;
 
 class PropiedadEntity {
   final String id;
@@ -29,6 +30,10 @@ class PropiedadEntity {
   final String corredorNombre;
   final String corredorImagen;
   final String corredorImagenPlaceholder;
+  final String corredorTelefono;
+  final String corredorEmail;
+  final String corredorEmpresa;
+  final String corredorCargo;
   // URL de detalle si el backend la provee
   final String urlDetalle;
   final DateTime fechaPublicacion;
@@ -60,6 +65,10 @@ class PropiedadEntity {
     this.corredorNombre = '',
     this.corredorImagen = '',
     this.corredorImagenPlaceholder = '',
+    this.corredorTelefono = '',
+    this.corredorEmail = '',
+    this.corredorEmpresa = '',
+    this.corredorCargo = '',
     this.urlDetalle = '',
     required this.fechaPublicacion,
     required this.activa,

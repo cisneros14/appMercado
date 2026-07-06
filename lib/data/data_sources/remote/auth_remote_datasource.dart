@@ -207,7 +207,7 @@ class AuthRemoteDataSource {
           // Si hay array de errores, los unimos
           String msg = data['message'] ?? 'Error en el registro';
           if (data['errors'] != null && (data['errors'] as List).isNotEmpty) {
-             msg += ': ' + (data['errors'] as List).join(', ');
+             msg += ': ${(data['errors'] as List).join(', ')}';
           }
           throw Exception(msg);
         }
@@ -215,7 +215,7 @@ class AuthRemoteDataSource {
           final data = response.data;
           String msg = data['message'] ?? 'Error de validación';
            if (data['errors'] != null && (data['errors'] as List).isNotEmpty) {
-             msg += ': ' + (data['errors'] as List).join(', ');
+             msg += ': ${(data['errors'] as List).join(', ')}';
           }
           throw Exception(msg);
       } else {
@@ -227,7 +227,7 @@ class AuthRemoteDataSource {
            if (data is Map && data['message'] != null) {
               String msg = data['message'];
                if (data['errors'] != null && (data['errors'] as List).isNotEmpty) {
-                 msg += ': ' + (data['errors'] as List).join(', ');
+                 msg += ': ${(data['errors'] as List).join(', ')}';
               }
               throw Exception(msg);
            }

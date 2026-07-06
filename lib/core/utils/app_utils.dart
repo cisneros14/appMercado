@@ -2,6 +2,7 @@
 /// 
 /// Contiene funciones auxiliares y utilidades comunes
 /// utilizadas en toda la aplicación.
+library;
 
 class AppUtils {
   /// Formatea un precio para mostrar en la UI

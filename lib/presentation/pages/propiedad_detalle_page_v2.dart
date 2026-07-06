@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import '../../core/widgets/screen_header_description.dart';
@@ -381,44 +382,169 @@ class _AgentCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nombre = propiedad.corredorNombre.isNotEmpty ? propiedad.corredorNombre : 'Agente Inmobiliario';
+    final cargo = propiedad.corredorCargo.isNotEmpty ? propiedad.corredorCargo : 'Agente Autorizado';
+    final empresa = propiedad.corredorEmpresa.isNotEmpty ? propiedad.corredorEmpresa : 'Triara';
+    final telefono = propiedad.corredorTelefono;
+    final email = propiedad.corredorEmail;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(50), // Pill shape más elegante
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 10, offset: const Offset(0, 4)),
-        ],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 20,
-            backgroundColor: Colors.grey.shade200,
-            backgroundImage: NetworkImage(normalizeImage(propiedad.corredorImagen)),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+        border: Border.all(color: Colors.grey.shade100),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: Colors.grey.shade200,
+                backgroundImage: NetworkImage(normalizeImage(propiedad.corredorImagen)),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      nombre,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF1a2c5b),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      cargo,
+                      style: TextStyle(
+                        color: Colors.grey.shade600,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    if (propiedad.corredorEmpresa.isNotEmpty) ...[
+                      const SizedBox(height: 1),
+                      Text(
+                        empresa,
+                        style: const TextStyle(
+                          color: Color(0xFF1a2c5b),
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (telefono.isNotEmpty || email.isNotEmpty) ...[
+            const Divider(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text(nombre, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                const Text('Agente Autorizado', style: TextStyle(color: Colors.grey, fontSize: 10)),
+                if (telefono.isNotEmpty)
+                  _ContactButton(
+                    icon: Icons.phone,
+                    label: 'Llamar',
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: telefono));
+                      Get.snackbar(
+                        'Contacto',
+                        'Teléfono: $telefono (Copiado al portapapeles)',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: const Color(0xFF1a2c5b),
+                        colorText: Colors.white,
+                      );
+                    },
+                  ),
+                if (telefono.isNotEmpty)
+                  _ContactButton(
+                    icon: Icons.chat,
+                    label: 'WhatsApp',
+                    color: Colors.green,
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: telefono));
+                      Get.snackbar(
+                        'WhatsApp',
+                        'Número: $telefono (Copiado). Chat con $nombre.',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.green.shade800,
+                        colorText: Colors.white,
+                      );
+                    },
+                  ),
+                if (email.isNotEmpty)
+                  _ContactButton(
+                    icon: Icons.email,
+                    label: 'Correo',
+                    color: Colors.orange,
+                    onTap: () {
+                      Clipboard.setData(ClipboardData(text: email));
+                      Get.snackbar(
+                        'Correo',
+                        'Email: $email (Copiado al portapapeles)',
+                        snackPosition: SnackPosition.BOTTOM,
+                        backgroundColor: Colors.orange.shade800,
+                        colorText: Colors.white,
+                      );
+                    },
+                  ),
               ],
             ),
-          ),
-          IconButton(
-            onPressed: () {
-              // Acción de llamar
-              Get.snackbar('Contactar', 'Llamando al agente...', snackPosition: SnackPosition.BOTTOM);
-            },
-            icon: const Icon(Icons.phone),
-            style: IconButton.styleFrom(
-              backgroundColor: const Color(0xFF1a2c5b),
-              foregroundColor: Colors.white,
-            ),
-          ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+class _ContactButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _ContactButton({
+    required this.icon,
+    required this.label,
+    this.color = const Color(0xFF1a2c5b),
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

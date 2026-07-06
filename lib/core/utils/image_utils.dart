@@ -28,16 +28,21 @@ String normalizeImage(dynamic img) {
   }
 
   // Manejar formas comunes
-  if (cleaned.startsWith('images/'))
+  if (cleaned.startsWith('images/')) {
     return Uri.encodeFull('$baseHost/$cleaned');
-  if (cleaned.startsWith('/admin/img/'))
+  }
+  if (cleaned.startsWith('/admin/img/')) {
     return Uri.encodeFull('$baseHost$cleaned');
-  if (cleaned.startsWith('/img/'))
+  }
+  if (cleaned.startsWith('/img/')) {
     return Uri.encodeFull('$baseHost/admin$cleaned');
-  if (cleaned.startsWith('admin/img/'))
+  }
+  if (cleaned.startsWith('admin/img/')) {
     return Uri.encodeFull('$baseHost/$cleaned');
-  if (cleaned.startsWith('img/'))
+  }
+  if (cleaned.startsWith('img/')) {
     return Uri.encodeFull('$baseHost/admin/$cleaned');
+  }
   if (cleaned.startsWith('admin/')) return Uri.encodeFull('$baseHost/$cleaned');
 
   // Por defecto, asumir que es filename dentro de /admin/img/
@@ -54,11 +59,23 @@ List<String> normalizeImageVariants(dynamic img) {
   final s = img.toString().trim();
   if (s.isEmpty) return [defaultPath];
   if (s.startsWith('http')) return [Uri.encodeFull(s)];
-  if (s.startsWith('//')) return [Uri.encodeFull('https:$s')];
-  if (s.startsWith('file:')) return [s]; // Mantener local para Image.file
-
+  
+  // Limpiar referencias relativas (./ ../) y backslashes
   var cleaned = s.replaceAll(RegExp(r'^(?:\./|\.\./)+'), '');
   cleaned = cleaned.replaceAll('\\', '/');
+
+  // CRITICAL FIX: Detectar URLs embebidas mal formadas por el backend
+  // Ejemplo: images/https://static.tokkobroker.com/...
+  if (cleaned.contains('http')) {
+     final httpIndex = cleaned.indexOf('http');
+     // Si encontramos un http en cualquier parte, asumimos que es la URL real
+     if (httpIndex != -1) {
+       return [Uri.encodeFull(cleaned.substring(httpIndex))];
+     }
+  }
+
+  if (cleaned.startsWith('//')) return [Uri.encodeFull('https:$cleaned')];
+  if (cleaned.startsWith('file:')) return [cleaned]; // Mantener local para Image.file
 
   final List<String> out = [];
 
@@ -71,28 +88,39 @@ List<String> normalizeImageVariants(dynamic img) {
     );
   }
 
+  // Lógica principal de variantes
   if (cleaned.startsWith('images/')) {
+    // Caso 1: Path canónico (images/img/foto.jpg)
     out.add(Uri.encodeFull('$baseHost/$cleaned'));
+    // Caso 2: images/ es redundante y es en realidad root (images/img -> img)
+    out.add(Uri.encodeFull('$baseHost/${cleaned.replaceFirst('images/', '')}'));
+    // Caso 3: Admin path
     out.add(Uri.encodeFull('$baseHost/admin/$cleaned'));
   }
-  // Variantes comunes para imagenes de usuarios/admin y propiedades
-  if (cleaned.startsWith('/admin/img/'))
-    out.add(Uri.encodeFull('$baseHost$cleaned'));
-  if (cleaned.startsWith('/img/'))
-    out.add(Uri.encodeFull('$baseHost/images$cleaned'));
+  
   if (cleaned.startsWith('img/')) {
-    out.add(Uri.encodeFull('$baseHost/images/$cleaned')); // propiedades
-    out.add(Uri.encodeFull('$baseHost/admin/$cleaned')); // agentes
-    out.add(Uri.encodeFull('$baseHost/admin/img/$cleaned'));
-    out.add(Uri.encodeFull('$baseHost/admin/images/$cleaned'));
-    out.add(Uri.encodeFull('$baseHost/images/${cleaned.replaceFirst('img/', '')}'));
-    out.add(Uri.encodeFull('$baseHost/admin/img/${cleaned.replaceFirst('img/', '')}'));
+    out.add(Uri.encodeFull('$baseHost/images/$cleaned')); // propiedades (images/img/)
+    out.add(Uri.encodeFull('$baseHost/admin/$cleaned')); // agentes (admin/img/)
+    out.add(Uri.encodeFull('$baseHost/admin/img/$cleaned')); 
+    out.add(Uri.encodeFull('$baseHost/admin/images/$cleaned')); 
+    out.add(Uri.encodeFull('$baseHost/$cleaned')); // root img/ (si existe)
+    out.add(Uri.encodeFull('$baseHost/images/${cleaned.replaceFirst('img/', '')}')); // images/foto.jpg
   }
 
-  if (cleaned.startsWith('admin/img/'))
+  // Variantes comunes para imagenes de usuarios/admin y propiedades
+  if (cleaned.startsWith('/admin/img/')) {
+    out.add(Uri.encodeFull('$baseHost$cleaned'));
+  }
+  if (cleaned.startsWith('/img/')) {
+    out.add(Uri.encodeFull('$baseHost/images$cleaned'));
+  }
+
+  if (cleaned.startsWith('admin/img/')) {
     out.add(Uri.encodeFull('$baseHost/$cleaned'));
-  if (cleaned.startsWith('admin/'))
+  }
+  if (cleaned.startsWith('admin/')) {
     out.add(Uri.encodeFull('$baseHost/$cleaned'));
+  }
 
   // Asegurar que la lista tiene al menos una variante razonable
   if (out.isEmpty) out.add(Uri.encodeFull('$baseHost/admin/img/$cleaned'));
